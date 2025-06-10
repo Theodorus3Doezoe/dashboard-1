@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+            xmlns:local="clr-namespace:dashboard"
+            xmlns:component="clr-namespace:dashboard.Component"
+            x:Class="dashboard.MainPage"
+            BackgroundColor="Black">
+
+    <Grid Padding="10" RowSpacing="10" ColumnSpacing="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="2*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="4*" />
+            <ColumnDefinition Width="2*" />
+            <ColumnDefinition Width="3*" />
+        </Grid.ColumnDefinitions>
+
+        <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+            <WebView x:Name="MapWebView"></WebView>
+        </Grid>
+
+
+        <Grid BackgroundColor="#2D3250" Grid.Row="0" Grid.Column="2">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <component:Module Grid.Row="0" Grid.Column="0"/>
+        </Grid>
+
+        <Border BackgroundColor="#2D3250" Grid.Row="1" Grid.Column="0">
+            <Label Text="Paneel 3 (L-Onder)" VerticalOptions="Center" HorizontalOptions="Center" TextColor="DimGray"/>
+        </Border>
+
+        <Border BackgroundColor="#2D3250" Grid.Row="1" Grid.Column="1">
+            <Label Text="Paneel 4 (M-Onder)" VerticalOptions="Center" HorizontalOptions="Center" TextColor="DimGray"/>
+        </Border>
+
+        <Border BackgroundColor="#2D3250" Grid.Row="1" Grid.Column="2">
+            <VerticalStackLayout Spacing="10" Padding="10">
+
+                <Label x:Name="WeatherLocationLabel" FontSize="16" FontAttributes="Bold" HorizontalTextAlignment="Center" Text="Weer ophalen..." />
+                <ActivityIndicator x:Name="WeatherActivityIndicator" IsRunning="True" />
+                <Label x:Name="WeatherTemperatureLabel" FontSize="28" HorizontalTextAlignment="Center" />
+                <Label x:Name="WeatherConditionLabel" FontSize="14" HorizontalTextAlignment="Center" />
+                <Image x:Name="WeatherIconImage" HeightRequest="50" HorizontalOptions="Center" />
+
+                <BoxView HeightRequest="1" Color="LightGray" Margin="0,10" />
+
+                <Label Text="Komende uren" FontAttributes="Bold" HorizontalTextAlignment="Center" />
+
+                <CollectionView x:Name="HourlyForecastCollectionView" HeightRequest="200">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid Padding="5" ColumnDefinitions="Auto,*,Auto">
+                                <Label Grid.Column="0" Text="{Binding ShortTime}" VerticalOptions="Center" />
+                                <Image Grid.Column="1" Source="{Binding Condition.Icon}" HeightRequest="40" HorizontalOptions="Center" />
+                                <Label Grid.Column="2" Text="{Binding TempC, StringFormat='{0}°C'}" VerticalOptions="Center" FontAttributes="Bold" />
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</ContentPage>
