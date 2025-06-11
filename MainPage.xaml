@@ -42,9 +42,16 @@
             <Label Text="Paneel 3 (L-Onder)" VerticalOptions="Center" HorizontalOptions="Center" TextColor="DimGray"/>
         </Border>
 
-        <Border BackgroundColor="#2D3250" Grid.Row="1" Grid.Column="1">
-            <Label Text="Paneel 4 (M-Onder)" VerticalOptions="Center" HorizontalOptions="Center" TextColor="DimGray"/>
-        </Border>
+        <Grid BackgroundColor="#2D3250" Grid.Row="1" Grid.Column="1">
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <component:Alert Grid.Column="0"/>
+        </Grid>
 
         <Border BackgroundColor="#2D3250" Grid.Row="1" Grid.Column="2">
             <VerticalStackLayout Spacing="10" Padding="10">
