@@ -54,31 +54,7 @@
         </Grid>
 
         <Border BackgroundColor="#2D3250" Grid.Row="1" Grid.Column="2">
-            <VerticalStackLayout Spacing="10" Padding="10">
 
-                <Label x:Name="WeatherLocationLabel" FontSize="16" FontAttributes="Bold" HorizontalTextAlignment="Center" Text="Weer ophalen..." />
-                <ActivityIndicator x:Name="WeatherActivityIndicator" IsRunning="True" />
-                <Label x:Name="WeatherTemperatureLabel" FontSize="28" HorizontalTextAlignment="Center" />
-                <Label x:Name="WeatherConditionLabel" FontSize="14" HorizontalTextAlignment="Center" />
-                <Image x:Name="WeatherIconImage" HeightRequest="50" HorizontalOptions="Center" />
-
-                <BoxView HeightRequest="1" Color="LightGray" Margin="0,10" />
-
-                <Label Text="Komende uren" FontAttributes="Bold" HorizontalTextAlignment="Center" />
-
-                <CollectionView x:Name="HourlyForecastCollectionView" HeightRequest="200">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate>
-                            <Grid Padding="5" ColumnDefinitions="Auto,*,Auto">
-                                <Label Grid.Column="0" Text="{Binding ShortTime}" VerticalOptions="Center" />
-                                <Image Grid.Column="1" Source="{Binding Condition.Icon}" HeightRequest="40" HorizontalOptions="Center" />
-                                <Label Grid.Column="2" Text="{Binding TempC, StringFormat='{0}°C'}" VerticalOptions="Center" FontAttributes="Bold" />
-                            </Grid>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-
-            </VerticalStackLayout>
         </Border>
     </Grid>
 </ContentPage>

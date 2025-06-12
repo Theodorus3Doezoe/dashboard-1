@@ -1,41 +1,34 @@
-﻿using System.Net.Http.Json;
-using dashboard.Models; // Belangrijk: verwijst naar de models die we net maakten
+﻿using System.Net.Http;
+using System.Threading.Tasks;
+using System.Text.Json;
+using dashboard.Models;
 
-namespace dashboard; // Zorg dat de namespace overeenkomt met je projectnaam
-
-public class WeerService
+namespace dashboard;
+public class WeatherService
 {
-    private readonly HttpClient _httpClient = new();
-
-    // ===================================================================
-    // HIER is de ENIGE plek waar je je API-sleutel moet invullen.
-    // Jouw sleutel moet hier staan, tussen de aanhalingstekens.
-    // ===================================================================
+    
+    private readonly HttpClient _httpClient = new HttpClient();
     private const string ApiKey = "de7d1c73381d4731a71163324251006";
+    private const string City = "Tilburg";
 
-
-    public async Task<WeatherData> GetWeatherForLocationAsync(double latitude, double longitude)
+    public async Task<WeatherApiResponse> GetWeatherAsync()
     {
-        // ===================================================================
-        // Deze 'if'-statement moet je NIET aanpassen. Zet hem terug
-        // naar de originele controle op de placeholder-tekst.
-        // ===================================================================
-        if (ApiKey == "VUL_HIER_JE_API_KEY_IN")
-        {
-            System.Diagnostics.Debug.WriteLine("API Key is niet ingesteld in WeatherService.cs");
-            return null;
-        }
-
-        var coordinates = $"{latitude.ToString(System.Globalization.CultureInfo.InvariantCulture)},{longitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}";
-        var url = $"https://api.weatherapi.com/v1/current.json?key={ApiKey}&q={coordinates}&aqi=no";
+        string url = $"https://api.weatherapi.com/v1/forecast.json?key={ApiKey}&q={City}&days=2&aqi=no&alerts=no";
 
         try
         {
-            return await _httpClient.GetFromJsonAsync<WeatherData>(url);
+            // Verstuur de request en krijg de JSON-string terug
+            string jsonResponse = await _httpClient.GetStringAsync(url);
+
+            // Converteer de JSON-string naar een C# object (zie WeerModels.cs hieronder)
+            WeatherApiResponse forecast = JsonSerializer.Deserialize<WeatherApiResponse>(jsonResponse);
+            Console.WriteLine(forecast);
+            return forecast;
         }
-        catch (Exception ex)
+        catch (HttpRequestException e)
         {
-            System.Diagnostics.Debug.WriteLine($"Fout bij ophalen weerdata: {ex.Message}");
+            // Log de fout of geef null terug
+            Console.WriteLine($"Fout bij het ophalen van weerdata: {e.Message}");
             return null;
         }
     }

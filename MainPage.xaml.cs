@@ -1,11 +1,13 @@
 ﻿using Microsoft.Maui.Devices.Sensors;
 using Microsoft.Maui.Platform;
-
+using System.Diagnostics;
+using System.Text.Json;
+using dashboard.Models; // De namespace van jouw modellen
 namespace dashboard
 {
     public partial class MainPage : ContentPage
     {
-        private readonly WeerService _weatherService = new(); // <-- VOEG DEZE REGEL TOE
+        private readonly WeatherService _weatherService = new WeatherService();
         public MainPage()
         {
             InitializeComponent();
@@ -22,56 +24,45 @@ namespace dashboard
             return reader.ReadToEnd();
         }
 
-        private async Task LoadWeatherDataAsync()
-        {
-            // Zet de UI in "laden" staat
-            WeatherActivityIndicator.IsRunning = true;
-            WeatherLocationLabel.Text = "Locatie ophalen...";
-
-            try
-            {
-                var location = await Geolocation.Default.GetLocationAsync(new GeolocationRequest
-                {
-                    DesiredAccuracy = GeolocationAccuracy.Medium,
-                    Timeout = TimeSpan.FromSeconds(30)
-                });
-
-                if (location != null)
-                {
-                    WeatherLocationLabel.Text = "Weer ophalen...";
-                    var weatherData = await _weatherService.GetWeatherForLocationAsync(location.Latitude, location.Longitude);
-
-                    if (weatherData != null)
-                    {
-                        // Vul de UI-elementen met de data
-                        WeatherLocationLabel.Text = weatherData.Location.Name;
-                        WeatherTemperatureLabel.Text = $"{weatherData.Current.TempC}°C";
-                        WeatherConditionLabel.Text = weatherData.Current.Condition.Text;
-                        WeatherIconImage.Source = ImageSource.FromUri(new Uri($"https:{weatherData.Current.Condition.Icon}"));
-                    }
-                    else
-                    {
-                        WeatherLocationLabel.Text = "Weerdata fout";
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Weather Error: {ex.Message}");
-                WeatherLocationLabel.Text = "Fout bij ophalen";
-                await DisplayAlert("Fout", $"Kon weerdata niet ophalen: {ex.Message}", "OK");
-            }
-            finally
-            {
-                // Stop altijd de laad-indicator
-                WeatherActivityIndicator.IsRunning = false;
-            }
-        }
-
         protected override async void OnAppearing()
         {
             base.OnAppearing();
-            await LoadWeatherDataAsync(); // Roep hier onze nieuwe methode aan
+            Debug.WriteLine("Pagina verschijnt, bezig met ophalen van weerdata...");
+
+            WeatherApiResponse forecast = await _weatherService.GetWeatherAsync();
+
+            if (forecast != null)
+            {
+                // --- DEZE HELE LOGICA IS VERNIEUWD ---
+
+                // 1. Rond de huidige tijd af naar het begin van het uur.
+                var now = DateTime.Now;
+                var startOfCurrentHour = new DateTime(now.Year, now.Month, now.Day, now.Hour, 0, 0);
+
+                // 2. Bouw de ultieme voorspellingslijst met een LINQ-keten!
+                var next24Hours = forecast.Forecast.ForecastDays // Start met de lijst van dagen ([vandaag, morgen])
+                    .SelectMany(day => day.Hour) // Pak de 'Hour'-lijsten van ELKE dag en voeg ze samen tot één grote lijst van 48 uur
+                    .Where(hour => DateTime.Parse(hour.Time) >= startOfCurrentHour) // Filter hieruit de uren die in de toekomst liggen
+                    .Take(24); // Neem van het resultaat de EERSTE 24 items.
+
+                // --- EINDE VERNIEUWDE LOGICA ---
+
+                Debug.WriteLine($"--- VOORSPELLING VOOR DE KOMENDE 24 UUR (vanaf {now:HH:mm}) ---");
+
+                foreach (var hourData in next24Hours)
+                {
+                    string timeOnly = hourData.Time.Split(' ')[1]; 
+                    Debug.WriteLine($"Tijd: {hourData.Time} - Temp: {hourData.TempC}°C - Conditie: {hourData.Condition.Text}");
+                }
+
+                Debug.WriteLine("-------------------------------------------------");
+            }
+            else
+            {
+                Debug.WriteLine("Fout: Het ophalen van de weerdata is mislukt.");
+            }
         }
+        }
+
     }
-}
+
