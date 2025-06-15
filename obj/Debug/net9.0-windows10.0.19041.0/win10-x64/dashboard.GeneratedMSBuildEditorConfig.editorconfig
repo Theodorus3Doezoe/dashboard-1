@@ -8,7 +8,7 @@ build_property.PlatformNeutralAssembly =
 build_property.EnforceExtendedAnalyzerRules = 
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = dashboard
-build_property.ProjectDir = C:\Users\Sven\source\repos\dashboard-1\
+build_property.ProjectDir = C:\Users\svend\RiderProjects\dashboard-1\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.CsWinRTAotOptimizerEnabled = true
@@ -22,43 +22,43 @@ build_property.CsWinRTUseWindowsUIXamlProjections = false
 build_property.EffectiveAnalysisLevelStyle = 9.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/Sven/source/repos/dashboard-1/App.xaml]
+[C:/Users/svend/RiderProjects/dashboard-1/App.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = dashboard.App.xaml
 build_metadata.AdditionalFiles.TargetPath = App.xaml
 build_metadata.AdditionalFiles.RelativePath = App.xaml
 
-[C:/Users/Sven/source/repos/dashboard-1/AppShell.xaml]
+[C:/Users/svend/RiderProjects/dashboard-1/AppShell.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = dashboard.AppShell.xaml
 build_metadata.AdditionalFiles.TargetPath = AppShell.xaml
 build_metadata.AdditionalFiles.RelativePath = AppShell.xaml
 
-[C:/Users/Sven/source/repos/dashboard-1/Component/Alert.xaml]
+[C:/Users/svend/RiderProjects/dashboard-1/Component/Alert.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = dashboard.Component.Alert.xaml
 build_metadata.AdditionalFiles.TargetPath = Component\Alert.xaml
 build_metadata.AdditionalFiles.RelativePath = Component\Alert.xaml
 
-[C:/Users/Sven/source/repos/dashboard-1/Component/Module.xaml]
+[C:/Users/svend/RiderProjects/dashboard-1/Component/Module.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = dashboard.Component.Module.xaml
 build_metadata.AdditionalFiles.TargetPath = Component\Module.xaml
 build_metadata.AdditionalFiles.RelativePath = Component\Module.xaml
 
-[C:/Users/Sven/source/repos/dashboard-1/MainPage.xaml]
+[C:/Users/svend/RiderProjects/dashboard-1/MainPage.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = dashboard.MainPage.xaml
 build_metadata.AdditionalFiles.TargetPath = MainPage.xaml
 build_metadata.AdditionalFiles.RelativePath = MainPage.xaml
 
-[C:/Users/Sven/source/repos/dashboard-1/Resources/Styles/Colors.xaml]
+[C:/Users/svend/RiderProjects/dashboard-1/Resources/Styles/Colors.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = dashboard.Resources.Styles.Colors.xaml
 build_metadata.AdditionalFiles.TargetPath = Resources\Styles\Colors.xaml
 build_metadata.AdditionalFiles.RelativePath = Resources\Styles\Colors.xaml
 
-[C:/Users/Sven/source/repos/dashboard-1/Resources/Styles/Styles.xaml]
+[C:/Users/svend/RiderProjects/dashboard-1/Resources/Styles/Styles.xaml]
 build_metadata.AdditionalFiles.GenKind = Xaml
 build_metadata.AdditionalFiles.ManifestResourceName = dashboard.Resources.Styles.Styles.xaml
 build_metadata.AdditionalFiles.TargetPath = Resources\Styles\Styles.xaml

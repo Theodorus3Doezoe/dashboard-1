@@ -3,6 +3,7 @@
             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
             xmlns:local="clr-namespace:dashboard"
             xmlns:component="clr-namespace:dashboard.Component"
+            xmlns:models="clr-namespace:dashboard.Models"
             x:Class="dashboard.MainPage"
             BackgroundColor="Black">
 
@@ -54,7 +55,24 @@
         </Grid>
 
         <Border BackgroundColor="#2D3250" Grid.Row="1" Grid.Column="2">
-
+            <CollectionView ItemsSource="{Binding HourlyForecast}">
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout Orientation="Horizontal" ItemSpacing="8"/>
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Hour">
+                        <StackLayout Padding="10" HorizontalOptions="Center" VerticalOptions="Center">
+                            <Image Source="{Binding Condition.IconUrl, StringFormat='https:{0}'}" 
+                                   HeightRequest="35" WidthRequest="35"/>
+                            <Label Text="{Binding TempC, StringFormat='{0:F0}°'}" 
+                                   TextColor="White" HorizontalOptions="Center"/>
+                            <Label Text="{Binding Time, StringFormat='{0:HH:mm}'}" 
+                                   TextColor="Gray" HorizontalOptions="Center"/>
+                        </StackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
         </Border>
+        
     </Grid>
 </ContentPage>

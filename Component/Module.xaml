@@ -24,7 +24,7 @@
         </Grid.ColumnDefinitions>
 
         <Label Text="M1" 
-               FontSize="30"
+               FontSize="Title"
                Grid.Row="0" 
                Grid.Column="0" 
                Grid.ColumnSpan="2" 
@@ -45,7 +45,7 @@
             />
 
         <Label Text="150"
-               FontSize="20"
+               FontSize="Title"
                Grid.Row="1"
                Grid.Column="1"
                HorizontalTextAlignment="Center"
@@ -53,7 +53,7 @@
                />
 
         <Label Text="37.5"
-               FontSize="20"
+               FontSize="Title"
                Grid.Row="2"
                Grid.Column="1"
                HorizontalTextAlignment="Center"
@@ -61,7 +61,7 @@
                />
 
         <Label Text="95%"
-               FontSize="20"
+               FontSize="Title"
                Grid.Row="3"
                Grid.Column="1"
                HorizontalTextAlignment="Center"
