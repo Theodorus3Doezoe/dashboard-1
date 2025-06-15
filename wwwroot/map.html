@@ -17,13 +17,22 @@
 
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <script>
-const map = L.map('map').setView([51.505, -0.09], 13); // London
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        const map = L.map('map').setView([51.539, 5.077], 15); // Fontys ICT Tilburg
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x} ', {
             attribution: '&copy; OpenStreetMap contributors'
         }).addTo(map);
 
-        L.marker([51.505, -0.09]).addTo(map)
+        L.marker([51.539, 5.077]).addTo(map)
             .bindPopup('A free map using Leaflet + OpenStreetMap!')
-            .openPopup();</script>
+            .openPopup();
+
+        function onMapClick(e) {
+            alert("You clicked the map at " + e.latlng);
+        }
+
+        map.on('click', onMapClick);
+    </script>
+
+        
 </body>
 </html>
