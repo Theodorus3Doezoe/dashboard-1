@@ -8,6 +8,7 @@ public partial class Module : ContentView
         InitializeComponent();
         TemperatureLabel.Text = "";
         HeartLabel.Text = "";
+        ZuurstofLabel.Text = "";
     }
 
     public void SetHeartLabel(string heart)
@@ -17,6 +18,11 @@ public partial class Module : ContentView
     public void SetTemperature(string temp)
     {
         TemperatureLabel.Text = temp;
+    }
+    
+    public void SetZuurstof(string temp)
+    {
+        ZuurstofLabel.Text = temp;
     }
     
 }

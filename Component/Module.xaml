@@ -62,7 +62,8 @@
                VerticalTextAlignment="Center"
                />
 
-        <Label Text="95%"
+        <Label Text=""
+               x:Name="ZuurstofLabel"
                FontSize="Title"
                Grid.Row="3"
                Grid.Column="1"

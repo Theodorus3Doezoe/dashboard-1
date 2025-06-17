@@ -48,6 +48,8 @@ namespace dashboard
             // Hier koppel je de event handler
             _mqttService.TemperatureUpdated += OnTemperatureReceived;
             _mqttService.HeartbeatUpdated += OnHeartbeatReceived;
+            _mqttService.ZuurstofUpdated += OnZuurstofReceived;
+
 
 
             var html = LoadHtmlFromFile("wwwroot/map.html");
@@ -144,6 +146,24 @@ namespace dashboard
                 }
             });
         }
+        
+        public void OnZuurstofReceived(string heartbeat)
+        {
+            Debug.WriteLine(heartbeat);
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                if (double.TryParse(heartbeat, NumberStyles.Integer, CultureInfo.InvariantCulture, out double hbValue))
+                {
+                    string roundedHb = hbValue.ToString("F1", CultureInfo.InvariantCulture);
+                    MyModule.SetZuurstof(roundedHb);
+                }
+                else
+                {
+                    MyModule.SetZuurstof("N/A");
+
+                }
+            });
+        }
 
 
 
@@ -165,9 +185,8 @@ namespace dashboard
         //     MainThread.BeginInvokeOnMainThread(() => HeartLabel.Text = message);
         // }
 
-        public void ChangeOxygen(string message)
-        {
+       // public void ChangeOxygen(string message)
+       // {
             //MainThread.BeginInvokeOnMainThread(() => OxygenLabel.Text = message);
         }
     }
-}
