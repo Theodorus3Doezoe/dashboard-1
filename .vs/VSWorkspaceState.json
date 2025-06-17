@@ -1,6 +1,8 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\Services"
   ],
+  "SelectedNode": "\\Services\\DatabaseHelper.cs",
   "PreviewInSolutionExplorer": false
 }

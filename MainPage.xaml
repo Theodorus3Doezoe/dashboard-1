@@ -6,6 +6,7 @@
             xmlns:models="clr-namespace:dashboard.Models"
             x:Class="dashboard.MainPage"
             BackgroundColor="Black">
+    
 
     <Grid Padding="10" RowSpacing="10" ColumnSpacing="10">
         <Grid.RowDefinitions>
@@ -36,7 +37,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <component:Module Grid.Row="0" Grid.Column="0"/>
+            <component:Module x:Name="MyModule" Grid.Row="0" Grid.Column="0"/>
         </Grid>
         
         <Border BackgroundColor="#2D3250" Grid.Row="1" Grid.Column="0">

@@ -1,19 +1,36 @@
-﻿using System.ComponentModel;
-using Microsoft.Maui.Devices.Sensors; // Belangrijk voor Location
+using System.ComponentModel;
 using System.Diagnostics;
 using dashboard.Models;
+using dashboard.Services;
+using System.Globalization;
+using Microsoft.Maui.Devices.Sensors; // Belangrijk voor Location
 using Microsoft.Maui.Controls;
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Globalization;
 using Microsoft.Maui.Dispatching;
 using System.Threading; // Toegevoegd voor CancellationToken, hoewel niet direct gebruikt in de simulatie, is het goede praktijk.
+
 
 namespace dashboard
 {
     public partial class MainPage : ContentPage, INotifyPropertyChanged
     {
+
+        // PropertyChanged voor binding
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        // Services
+        private readonly DatabaseHelper _databaseHelper;
+        private readonly MqttService _mqttService;
+
+        // Constructor
+
         // Variabelen voor Objective
         private double? objectiveLatitude;
         private double? objectiveLongitude;
@@ -29,8 +46,6 @@ namespace dashboard
         private const double UpdateIntervalSeconds = 1.0;
         private const double MetersPerDegreeLatitude = 111132.954;
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
         private IEnumerable<Hour> _hourlyForecast;
         public IEnumerable<Hour> HourlyForecast
         {
@@ -45,6 +60,16 @@ namespace dashboard
             InitializeComponent();
             BindingContext = this;
 
+            string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
+            string dbPath = Path.Combine(desktopPath, "dashboard.db");
+            _databaseHelper = new DatabaseHelper(dbPath);
+            _mqttService = new MqttService(this, _databaseHelper);
+
+            // Hier koppel je de event handler
+            _mqttService.TemperatureUpdated += OnTemperatureReceived;
+            _mqttService.HeartbeatUpdated += OnHeartbeatReceived;
+            _mqttService.ZuurstofUpdated += OnZuurstofReceived;
+
             var html = LoadHtmlFromFile("wwwroot/map.html");
             MapWebView.Source = new HtmlWebViewSource { Html = html };
             MapWebView.Navigating += MapWebView_Navigating;
@@ -57,6 +82,9 @@ namespace dashboard
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+
+
+        // Laad lokaal html bestand in webview
         string LoadHtmlFromFile(string filename)
         {
             using var stream = FileSystem.OpenAppPackageFileAsync(filename).Result;
@@ -64,6 +92,12 @@ namespace dashboard
             return reader.ReadToEnd();
         }
 
+        // Initialiseer bij pagina openen
+        protected override async void OnAppearing()
+        {
+            base.OnAppearing();
+            Debug.WriteLine("Pagina verschijnt, bezig met ophalen van weerdata...");
+            await _databaseHelper.InitAsync();
         private void InitializeSimulationTimer()
         {
             simulationTimer = Dispatcher.CreateTimer();
@@ -119,7 +153,6 @@ namespace dashboard
 
         protected override async void OnAppearing()
         {
-            base.OnAppearing();
             WeatherApiResponse forecast = await _weatherService.GetWeatherAsync();
             if (forecast != null)
             {
@@ -131,6 +164,22 @@ namespace dashboard
                     .Take(24);
             }
         }
+
+
+                HourlyForecast = forecast.Forecast.ForecastDays
+                    .SelectMany(day => day.Hour)
+                    .Where(hour => DateTime.Parse(hour.Time) >= startOfCurrentHour)
+                    .Take(24);
+
+                foreach (var hourData in HourlyForecast)
+                {
+                    Debug.WriteLine(
+                        $"Tijd: {hourData.Time} - Temp: {hourData.TempC}°C - Conditie: {hourData.Condition.Text}");
+                }
+            }
+            else
+            {
+                Debug.WriteLine("Fout: Het ophalen van de weerdata is mislukt.");
 
         private void MapWebView_Navigating(object sender, WebNavigatingEventArgs e)
         {
@@ -149,8 +198,103 @@ namespace dashboard
                     objectiveLongitude = double.Parse(lngStr, CultureInfo.InvariantCulture);
                     Debug.WriteLine($"--- NIEUW DOEL INGESTELD: Lat: {objectiveLatitude}, Lng: {objectiveLongitude} ---");
                 }
+
             }
+
+            // MQTT LIVE DATA LOGGEN IN TERMINAL
+            Device.StartTimer(TimeSpan.FromSeconds(2), () =>
+            {
+                Debug.WriteLine("--------- LIVE MQTT DATA ---------");
+                Debug.WriteLine($"Temperatuur: {_mqttService.LatestTemperature}");
+                Debug.WriteLine($"Geluid: {_mqttService.LatestSound}");
+                // Debug.WriteLine($"Gas: {_mqttService.LatestGas}");
+                //Debug.WriteLine($"Locatie: {_mqttService.LatestLocation}");
+                // Debug.WriteLine($"Oxygen: {_mqttService.LatestOxygen}");
+                // Debug.WriteLine($"Hartslag: {_mqttService.LatestHeartbeat}");
+                return true; // blijf herhalen
+            });
         }
+
+// LIVE WEERGAVE (MQTT)
+        public void OnTemperatureReceived(string temperature)
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                if (double.TryParse(temperature, NumberStyles.Float, CultureInfo.InvariantCulture,
+                        out double tempValue))
+                {
+                    string roundedTemp = tempValue.ToString("F1", CultureInfo.InvariantCulture);
+                    MyModule.SetTemperature(roundedTemp);
+                }
+                else
+                {
+                    // fallback, toon originele string als het niet lukt te converteren
+                    MyModule.SetTemperature(temperature);
+                }
+            });
+        }
+
+        public void OnHeartbeatReceived(string heartbeat)
+        {
+            Debug.WriteLine(heartbeat);
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                if (double.TryParse(heartbeat, NumberStyles.Integer, CultureInfo.InvariantCulture, out double hbValue))
+                {
+                    string roundedHb = hbValue.ToString("F1", CultureInfo.InvariantCulture);
+                    MyModule.SetHeartLabel(roundedHb);
+                }
+                else
+                {
+                    MyModule.SetHeartLabel(heartbeat);
+
+                }
+            });
+        }
+        
+        public void OnZuurstofReceived(string heartbeat)
+        {
+            Debug.WriteLine(heartbeat);
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                if (double.TryParse(heartbeat, NumberStyles.Integer, CultureInfo.InvariantCulture, out double hbValue))
+                {
+                    string roundedHb = hbValue.ToString("F1", CultureInfo.InvariantCulture);
+                    MyModule.SetZuurstof(roundedHb);
+                }
+                else
+                {
+                    MyModule.SetZuurstof("N/A");
+
+                }
+            });
+        }
+
+
+
+
+
+
+        // public void ShowDirection(string message)
+        // {
+        //     MainThread.BeginInvokeOnMainThread(() => DirectionLabel.Text = message);
+        // }
+
+        // public void ShowSound(string message)
+        // {
+        //     MainThread.BeginInvokeOnMainThread(() => SoundLabel.Text = message);
+        // }
+
+        // public void ChangeHeartbeat(string message)
+        // {
+        //     MainThread.BeginInvokeOnMainThread(() => HeartLabel.Text = message);
+        // }
+
+       // public void ChangeOxygen(string message)
+       // {
+            //MainThread.BeginInvokeOnMainThread(() => OxygenLabel.Text = message);
+        }
+    }
 
         // ✨ GECORRIGEERD: Gebruik de volledige namespace om de fout op te lossen
         private void CalculateDistanceAndBearing(Microsoft.Maui.Devices.Sensors.Location personLocation)
