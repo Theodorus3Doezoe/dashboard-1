@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using Microsoft.Maui.Devices.Sensors; // Belangrijk voor Location
 using System.Diagnostics;
 using dashboard.Models;

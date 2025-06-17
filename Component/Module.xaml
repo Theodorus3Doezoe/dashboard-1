@@ -61,7 +61,7 @@
                HorizontalTextAlignment="Center"
                VerticalTextAlignment="Center"
                />
-
+      
         <Label Text=""
                x:Name="ZuurstofLabel"
                FontSize="Title"
