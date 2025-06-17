@@ -44,15 +44,8 @@
             Grid.Row="3"
             />
 
-        <Label Text="150"
-               FontSize="Title"
-               Grid.Row="1"
-               Grid.Column="1"
-               HorizontalTextAlignment="Center"
-               VerticalTextAlignment="Center"
-               />
-
-        <Label Text="37.5"
+        <Label Text=""
+               x:Name="TemperatureLabel"
                FontSize="Title"
                Grid.Row="2"
                Grid.Column="1"
@@ -60,7 +53,17 @@
                VerticalTextAlignment="Center"
                />
 
-        <Label Text="95%"
+        <Label Text=""
+               x:Name="HeartLabel"
+               FontSize="Title"
+               Grid.Row="1"
+               Grid.Column="1"
+               HorizontalTextAlignment="Center"
+               VerticalTextAlignment="Center"
+               />
+
+        <Label Text=""
+               x:Name="ZuurstofLabel"
                FontSize="Title"
                Grid.Row="3"
                Grid.Column="1"

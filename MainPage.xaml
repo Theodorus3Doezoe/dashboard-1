@@ -36,7 +36,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <component:Module Grid.Row="0" Grid.Column="0"/>
+            <component:Module x:Name="MyModule" Grid.Row="0" Grid.Column="0"/>
         </Grid>
         
         <Border BackgroundColor="#2D3250" Grid.Row="1" Grid.Column="0">
