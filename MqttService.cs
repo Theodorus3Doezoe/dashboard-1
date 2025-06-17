@@ -26,6 +26,9 @@ namespace dashboard
         private const string MqttTopicTemperature = "temperature sensor";
         private const string MqttTopicLocationLat = "Gps_sensor_lat";
         private const string MqttTopicLocationLon = "Gps_sensor_lon";
+        
+        // ✨ NIEUW: Topics voor de berekende data
+        public const string MqttTopicObjectiveData = "dashboard/objective/data";
 
         // Properties om laatste sensorwaarden op te slaan
         public string LatestSound { get; private set; }
@@ -163,6 +166,32 @@ namespace dashboard
             SaveToDatabase(message, topic);
         }
 
+        // ✨ NIEUW: Publieke methode om berichten te publiceren
+        public void PublishMessage(string topic, string message)
+        {
+            // Controleer of de client verbonden is
+            if (_mqttClient == null || !_mqttClient.IsConnected)
+            {
+                Debug.WriteLine("Kan niet publiceren, MQTT client is niet verbonden.");
+                return;
+            }
+
+            try
+            {
+                // Publiceer het bericht
+                _mqttClient.Publish(
+                    topic,
+                    Encoding.UTF8.GetBytes(message),
+                    MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE,
+                    false // retain flag
+                );
+                Debug.WriteLine($"Gepubliceerd naar topic '{topic}': {message}");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Publiceren naar MQTT topic {topic} mislukt: {ex.Message}");
+            }
+        }
         private async void SaveToDatabase(string message, string topic)
         {
             try
