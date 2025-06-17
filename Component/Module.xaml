@@ -44,6 +44,7 @@
             Grid.Row="3"
             />
 
+
         <Label Text=""
                x:Name="TemperatureLabel"
                FontSize="Title"
@@ -61,6 +62,7 @@
                HorizontalTextAlignment="Center"
                VerticalTextAlignment="Center"
                />
+
 
         <Label Text=""
                x:Name="ZuurstofLabel"
