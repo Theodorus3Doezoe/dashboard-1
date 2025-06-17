@@ -1,4 +1,5 @@
 
+
 namespace dashboard.Component;
 
 public partial class Module : ContentView
