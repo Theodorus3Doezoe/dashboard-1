@@ -5,34 +5,208 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
-        html, body, #map {
-            height: 100%;
+        body {
             margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
+        }
+
+        .legend-container {
+            width: 50px;
+            background-color: #2D3250;
+            padding: 10px 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.3);
+            z-index: 1000;
+        }
+
+        .legend-item {
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            transition: all 0.2s;
+            color: white;
+        }
+
+        .legend-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.1);
+        }
+
+        .legend-icon {
+            font-size: 20px;
+        }
+
+        #map {
+            flex: 1;
+            height: 100%;
+        }
+
+        .map-icon {
+            background: rgba(45, 50, 80, 0.9);
+            border-radius: 50%;
+            padding: 5px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            border: 1px solid #555;
+        }
+
+        .button-group {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #555;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
         }
     </style>
 </head>
 <body>
-    <div id="map"></div>
+<div class="legend-container">
+    <div class="legend-item" onclick="addMarker('danger')" title="Danger Zone">
+        <i class="fas fa-radiation legend-icon" style="color: #ff0000;"></i>
+    </div>
+    <div class="legend-item" onclick="addMarker('enemy')" title="Enemy Position">
+        <i class="fas fa-skull legend-icon" style="color: #ff6600;"></i>
+    </div>
+    <div class="legend-item" onclick="addMarker('friendly')" title="Friendly Forces">
+        <i class="fas fa-flag legend-icon" style="color: #00ff00;"></i>
+    </div>
+    <div class="legend-item" onclick="addMarker('objective')" title="Mission Objective">
+        <i class="fas fa-bullseye legend-icon" style="color: #ffff00;"></i>
+    </div>
+    <div class="legend-item" onclick="addMarker('extraction')" title="Extraction Point">
+        <i class="fas fa-helicopter legend-icon" style="color: #00ccff;"></i>
+    </div>
+    <div class="button-group">
+        <div class="legend-item" onclick="undoMarker()" title="Undo Last Marker">
+            <i class="fas fa-arrow-left legend-icon" style="color: #cccccc;"></i>
+        </div>
+        <div class="legend-item" onclick="clearMarkers()" title="Clear All Markers">
+            <i class="fas fa-trash legend-icon" style="color: #cccccc;"></i>
+        </div>
+    </div>
+</div>
 
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script>
-        const map = L.map('map').setView([51.539, 5.077], 15); // Fontys ICT Tilburg
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x} ', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
+<div id="map"></div>
 
-        L.marker([51.539, 5.077]).addTo(map)
-            .bindPopup('A free map using Leaflet + OpenStreetMap!')
-            .openPopup();
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+<script>
+    const map = L.map('map').setView([51.539, 5.077], 15); // Fontys ICT Tilburg
+    L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x} ', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
 
-        function onMapClick(e) {
-            alert("You clicked the map at " + e.latlng);
+    // Store markers
+    const markers = [];
+    let currentIconType = null;
+
+    // Military icon types
+    const iconTypes = {
+        danger: { icon: 'fa-radiation', color: '#ff0000' },
+        enemy: { icon: 'fa-skull', color: '#ff6600' },
+        friendly: { icon: 'fa-flag', color: '#00ff00' },
+        objective: { icon: 'fa-bullseye', color: '#ffff00' },
+        extraction: { icon: 'fa-helicopter', color: '#00ccff' }
+    };
+
+    // Function to set current icon type
+    function addMarker(type) {
+        currentIconType = type;
+    }
+
+    // Add marker on map click
+    map.on('click', function (e) {
+        if (currentIconType) {
+            const type = currentIconType;
+            const iconInfo = iconTypes[type];
+
+            // Create a custom HTML icon
+            const icon = L.divIcon({
+                html: `<i class="fas ${iconInfo.icon} map-icon" style="color: ${iconInfo.color};"></i>`,
+                className: '',
+                iconSize: [30, 30]
+            });
+
+            const marker = L.marker(e.latlng, { icon: icon })
+                .addTo(map)
+                .bindPopup(`<b>${type.toUpperCase()}</b><br>${e.latlng.lat.toFixed(4)}, ${e.latlng.lng.toFixed(4)}`);
+
+            markers.push(marker);
+            
+            if (currentIconType === 'objective') {
+                const lat = e.latlng.lat.toFixed(4);
+                const lng = e.latlng.lng.toFixed(4);
+                console.log(`Lat: ${lat} Long: ${lng}`);
+                window.location.href = `app:coords?lat=${lat}&lng=${lng}`;
+            }
         }
+    });
 
-        map.on('click', onMapClick);
-    </script>
+    function locationMarker(lat, lng, type) {
+        L.marker([lat, lng])              // standaard icoon
+            .addTo(map)
+            .bindPopup(`<b>${type.toUpperCase()}</b><br>${lat.toFixed(4)}, ${lng.toFixed(4)}`);
+    }
 
-        
+    let gpsMarker = null;
+
+    // ✨ NIEUW: Functie om de GPS-marker aan te maken of te verplaatsen
+    function createOrUpdateGpsMarker(lat, lng) {
+        const newLatLng = L.latLng(lat, lng);
+
+        if (gpsMarker === null) {
+            // Marker bestaat nog niet, dus maak hem aan
+            const gpsIcon = L.divIcon({
+                html: `<i class="fas fa-person-walking" style="color: #00aaff; font-size: 24px;"></i>`,
+                className: '', // Geen extra class nodig
+                iconSize: [24, 24],
+                iconAnchor: [12, 12] // Centreer het icoon
+            });
+
+            gpsMarker = L.marker(newLatLng, { icon: gpsIcon }).addTo(map);
+            map.setView(newLatLng, 16); // Centreer de kaart op de startpositie
+        } else {
+            // Marker bestaat al, dus verplaats hem
+            gpsMarker.setLatLng(newLatLng);
+            map.panTo(newLatLng); // Zorg dat de kaart soepel meebeweegt
+        }
+    }
+
+    // ✨ NIEUW: Functie om de GPS-marker te verwijderen
+    function removeGpsMarker() {
+        if (gpsMarker !== null) {
+            map.removeLayer(gpsMarker);
+            gpsMarker = null;
+        }
+    }
+
+    // Function to clear all markers
+    function clearMarkers() {
+        markers.forEach(marker => map.removeLayer(marker));
+        markers.length = 0;
+        currentIconType = null;
+    }
+
+    // Function to undo last marker
+    function undoMarker() {
+        if (markers.length > 0) {
+            const lastMarker = markers.pop();
+            map.removeLayer(lastMarker);
+        }
+    }
+</script>
 </body>
 </html>

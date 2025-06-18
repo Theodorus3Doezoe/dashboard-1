@@ -13,6 +13,7 @@ using Microsoft.Maui.Storage; // Voor FileSystem
 using System.IO;
 using dashboard.Services;
 using dashboard.Component;
+using System.Text.Json;
 
 namespace dashboard
 {
@@ -65,7 +66,8 @@ namespace dashboard
             _mqttService.TemperatureUpdated += OnTemperatureReceived;
             _mqttService.HeartbeatUpdated += OnHeartbeatReceived;
             _mqttService.ZuurstofUpdated += OnZuurstofReceived;
-            _mqttService.DirectionUpdated += OnDirectionReceived;
+            _mqttService.
+            Updated += OnDirectionReceived;
             _mqttService.GasUpdated += OnGasReceived;
 
             // Laad de kaart in de WebView
