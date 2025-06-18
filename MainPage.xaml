@@ -6,6 +6,7 @@
             xmlns:models="clr-namespace:dashboard.Models"
             x:Class="dashboard.MainPage"
             BackgroundColor="Black">
+    
 
     <Grid Padding="10" RowSpacing="10" ColumnSpacing="10">
         <Grid.RowDefinitions>
@@ -36,23 +37,23 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <component:Module Grid.Row="0" Grid.Column="0"/>
+            <component:Module x:Name="MyModule" Grid.Row="0" Grid.Column="0"/>
         </Grid>
-
+        
         <Border BackgroundColor="#2D3250" Grid.Row="1" Grid.Column="0">
-            <Label Text="Paneel 3 (L-Onder)" VerticalOptions="Center" HorizontalOptions="Center" TextColor="DimGray"/>
+            <VerticalStackLayout Spacing="10" Padding="15" VerticalOptions="Center">
+                <Label Text="GPS Simulatie" TextColor="White" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center"/>
+                <Button x:Name="StartButton" Text="Start Simulatie" Clicked="StartSimulation_Clicked" />
+                <Button x:Name="StopButton" Text="Stop Simulatie" Clicked="StopSimulation_Clicked" IsEnabled="False" />
+            </VerticalStackLayout>
         </Border>
 
-        <Grid BackgroundColor="#2D3250" Grid.Row="1" Grid.Column="1">
+        <Border BackgroundColor="#2D3250" Grid.Row="1" Grid.Column="1">
+            <ScrollView>
+                <VerticalStackLayout x:Name="AlertsStack" Padding="10" Spacing="10" />
+            </ScrollView>
+        </Border>
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <component:Alert Grid.Column="0"/>
-        </Grid>
 
         <Border BackgroundColor="#2D3250" Grid.Row="1" Grid.Column="2">
             <CollectionView ItemsSource="{Binding HourlyForecast}">
