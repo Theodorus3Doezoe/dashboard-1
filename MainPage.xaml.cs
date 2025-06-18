@@ -66,8 +66,7 @@ namespace dashboard
             _mqttService.TemperatureUpdated += OnTemperatureReceived;
             _mqttService.HeartbeatUpdated += OnHeartbeatReceived;
             _mqttService.ZuurstofUpdated += OnZuurstofReceived;
-            _mqttService.
-            Updated += OnDirectionReceived;
+            _mqttService.DirectionUpdated += OnDirectionReceived;
             _mqttService.GasUpdated += OnGasReceived;
 
             // Laad de kaart in de WebView
@@ -163,7 +162,7 @@ namespace dashboard
                 }
                 else
                 {
-                    MyModule.SetZuurstof("N/A"); // Fallback
+                    MyModule.SetZuurstof(""); // Fallback
                 }
             });
         }
@@ -238,8 +237,8 @@ namespace dashboard
         {
             if (isSimulating) return;
             isSimulating = true;
-            // StartButton.IsEnabled = false; // Schakel knoppen uit/in indien nodig
-            // StopButton.IsEnabled = true;
+            StartButton.IsEnabled = false; // Schakel knoppen uit/in indien nodig
+            StopButton.IsEnabled = true;
 
             currentLatitude = 51.539; // Startpositie (voorbeeld)
             currentLongitude = 5.077;
@@ -251,8 +250,8 @@ namespace dashboard
             if (!isSimulating) return;
             isSimulating = false;
             simulationTimer.Stop();
-            // StartButton.IsEnabled = true;
-            // StopButton.IsEnabled = false;
+            StartButton.IsEnabled = true;
+            StopButton.IsEnabled = false;
 
             await MapWebView.EvaluateJavaScriptAsync("removeGpsMarker();");
         }
@@ -307,10 +306,21 @@ namespace dashboard
             double endLat = objectiveLatitude.Value;
             double endLng = objectiveLongitude.Value;
 
+            // Roep de lokale methodes hieronder aan
             double distanceKm = CalculateDistance(startLat, startLng, endLat, endLng);
             double bearingDegrees = CalculateBearing(startLat, startLng, endLat, endLng);
-            
+
             Debug.WriteLine($"Afstand: {distanceKm:F2} km | Richting: {bearingDegrees:F1}°");
+            
+            // 1. Converteer de waarden naar strings, met een punt als decimaalteken.
+            string distanceStr = Math.Round(distanceKm, 2).ToString("F2", CultureInfo.InvariantCulture);
+            string bearingStr = Math.Round(bearingDegrees, 1).ToString("F1", CultureInfo.InvariantCulture);
+
+            // 2. Combineer de waarden in één string, gescheiden door een komma.
+            string combinedPayload = $"{distanceStr},{bearingStr}";
+
+            // 3. Publiceer de gecombineerde string.
+            _mqttService.PublishMessage(MqttService.MqttTopicObjectiveData, combinedPayload);
         }
 
         private double CalculateDistance(double startLat, double startLng, double endLat, double endLng)
@@ -337,23 +347,5 @@ namespace dashboard
             double bearingRad = Math.Atan2(y, x);
             return (bearingRad * 180 / Math.PI + 360) % 360;
         }
-
-        // --- OUDE UI UPDATE METHODES (UITGECOMMENTEERD) ---
-        // public void ShowDirection(string message)
-        // {
-        //     MainThread.BeginInvokeOnMainThread(() => DirectionLabel.Text = message);
-        // }
-        // public void ShowSound(string message)
-        // {
-        //     MainThread.BeginInvokeOnMainThread(() => SoundLabel.Text = message);
-        // }
-        // public void ChangeHeartbeat(string message)
-        // {
-        //     MainThread.BeginInvokeOnMainThread(() => HeartLabel.Text = message);
-        // }
-        // public void ChangeOxygen(string message)
-        // {
-        //     MainThread.BeginInvokeOnMainThread(() => OxygenLabel.Text = message);
-        // }
     }
 }

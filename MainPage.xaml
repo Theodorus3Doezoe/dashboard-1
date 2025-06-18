@@ -22,6 +22,12 @@
 
         <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
             <WebView x:Name="MapWebView"></WebView>
+            <WebView x:Name="HololensViewer"
+                     Grid.Row="0" 
+                     Grid.Column="0" 
+                     IsVisible="False"
+                     BackgroundColor="Black"/>
+
         </Grid>
 
 
@@ -45,6 +51,7 @@
                 <Label Text="GPS Simulatie" TextColor="White" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center"/>
                 <Button x:Name="StartButton" Text="Start Simulatie" Clicked="StartSimulation_Clicked" />
                 <Button x:Name="StopButton" Text="Stop Simulatie" Clicked="StopSimulation_Clicked" IsEnabled="False" />
+                
             </VerticalStackLayout>
         </Border>
 

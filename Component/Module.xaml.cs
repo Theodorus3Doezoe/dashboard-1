@@ -11,7 +11,9 @@ public partial class Module : ContentView
         HeartLabel.Text = "";
         ZuurstofLabel.Text = "";
     }
+    
 
+    
     public void SetHeartLabel(string heart)
     {
         HeartLabel.Text = heart;
@@ -25,5 +27,5 @@ public partial class Module : ContentView
     {
         ZuurstofLabel.Text = temp;
     }
-    
+
 }

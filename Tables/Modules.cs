@@ -1,6 +1,6 @@
 using SQLite;
 namespace dashboard.Tables;
-    public class Modules
+    public class DeviceModules
     {
         [PrimaryKey, AutoIncrement]
         public int Id { get; set; }
