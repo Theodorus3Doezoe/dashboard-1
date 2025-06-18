@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
             xmlns:local="clr-namespace:dashboard"
@@ -48,16 +48,12 @@
             </VerticalStackLayout>
         </Border>
 
-        <Grid BackgroundColor="#2D3250" Grid.Row="1" Grid.Column="1">
+        <Border BackgroundColor="#2D3250" Grid.Row="1" Grid.Column="1">
+            <ScrollView>
+                <VerticalStackLayout x:Name="AlertsStack" Padding="10" Spacing="10" />
+            </ScrollView>
+        </Border>
 
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <component:Alert Grid.Column="0"/>
-        </Grid>
 
         <Border BackgroundColor="#2D3250" Grid.Row="1" Grid.Column="2">
             <CollectionView ItemsSource="{Binding HourlyForecast}">
@@ -80,4 +76,5 @@
         </Border>
         
     </Grid>
+
 </ContentPage>

@@ -1,3 +1,4 @@
+
 using System.Text;
 using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Messages;
@@ -26,9 +27,6 @@ namespace dashboard
         private const string MqttTopicTemperature = "temperature sensor";
         private const string MqttTopicLocationLat = "Gps_sensor_lat";
         private const string MqttTopicLocationLon = "Gps_sensor_lon";
-        
-        // ✨ NIEUW: Topics voor de berekende data
-        public const string MqttTopicObjectiveData = "dashboard/objective/data";
 
         // Properties om laatste sensorwaarden op te slaan
         public string LatestSound { get; private set; }
@@ -99,6 +97,8 @@ namespace dashboard
         public event Action<string>? TemperatureUpdated;
         public event Action<string>? HeartbeatUpdated;
         public event Action<string>? ZuurstofUpdated;
+        public event Action<string>? DirectionUpdated;
+        public event Action<string>? GasUpdated;
 
         private void Client_MqttMsgPublishReceived(object sender, MqttMsgPublishEventArgs e)
         {
@@ -122,11 +122,22 @@ namespace dashboard
                 ZuurstofUpdated?.Invoke(message);
             }
 
+            if (topic == "sensor/geluid")
+            {
+                DirectionUpdated?.Invoke(message);
+            }
+
+            if (topic == "sensor/gas")
+            {
+                GasUpdated?.Invoke(message);
+            }
+
             // Update properties
             switch (topic)
             {
                 case MqttTopicSound:
                     LatestSound = message;
+                    DirectionUpdated?.Invoke(message);
                     break;
 
                 case MqttTopicTemperature:
@@ -137,6 +148,7 @@ namespace dashboard
 
                 case MqttTopicGasDetection:
                     LatestGasDetection = message;
+                    GasUpdated?.Invoke(message);
                     break;
 
                 case MqttTopicLocationLat:
@@ -166,32 +178,6 @@ namespace dashboard
             SaveToDatabase(message, topic);
         }
 
-        // ✨ NIEUW: Publieke methode om berichten te publiceren
-        public void PublishMessage(string topic, string message)
-        {
-            // Controleer of de client verbonden is
-            if (_mqttClient == null || !_mqttClient.IsConnected)
-            {
-                Debug.WriteLine("Kan niet publiceren, MQTT client is niet verbonden.");
-                return;
-            }
-
-            try
-            {
-                // Publiceer het bericht
-                _mqttClient.Publish(
-                    topic,
-                    Encoding.UTF8.GetBytes(message),
-                    MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE,
-                    false // retain flag
-                );
-                Debug.WriteLine($"Gepubliceerd naar topic '{topic}': {message}");
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Publiceren naar MQTT topic {topic} mislukt: {ex.Message}");
-            }
-        }
         private async void SaveToDatabase(string message, string topic)
         {
             try
@@ -199,7 +185,7 @@ namespace dashboard
                 var timestamp = DateTime.UtcNow.AddHours(2).ToString("yyyy-MM-dd HH:mm:ss");
 
                 // Sensorwaarden gaan naar de Modules-tabel
-                if (topic == MqttTopicTemperature || topic == MqttTopicHartslag || topic == MqttTopicZuurstof)
+                if (topic == MqttTopicTemperature || topic == MqttTopicHartslag || topic == MqttTopicZuurstof || topic == MqttTopicSound || topic == MqttTopicGasDetection)
                 {
                     var newModule = new Modules
                     {
@@ -243,8 +229,32 @@ namespace dashboard
                             return;
                         }
                     }
+                    else if (topic == MqttTopicSound)
+                    {
+                        if (float.TryParse(message, NumberStyles.Float, CultureInfo.InvariantCulture, out float directionValue))
+                        {
+                            newModule.Direction = directionValue;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Kon directie niet parsen: " + message);
+                            return;
+                        }
+                    }
+                    else if (topic == MqttTopicGasDetection)
+                    {
+                        if (int.TryParse(message, out int gasValue))
+                        {
+                            newModule.Gas = gasValue;
+                        }
+                        else
+                        {
+                            Console.WriteLine("Kon gas niet parsen: " + message);
+                            return;
+                        }
+                    }
 
-                    await _databaseHelper.SaveModulesAsync(newModule);
+                        await _databaseHelper.SaveModulesAsync(newModule);
                     Console.WriteLine("Sensor data opgeslagen in Modules tabel.");
                 }
                 // GPS-gegevens gaan naar de Paden-tabel
