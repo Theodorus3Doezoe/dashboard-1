@@ -49,12 +49,30 @@ namespace dashboard
         private const double SpeedKmh = 6.0;
         private const double UpdateIntervalSeconds = 1.0;
         private const double MetersPerDegreeLatitude = 111132.954;
+        
+        private bool _isCameraActief;
+        private WebView _cameraViewer;
+
 
         // --- CONSTRUCTOR ---
         public MainPage()
         {
             InitializeComponent();
             BindingContext = this;
+            
+            // Voeg de WebView toe voor de camera (verborgen bij start)
+            _cameraViewer = new WebView
+            {
+                IsVisible = false,
+                BackgroundColor = Colors.Black,
+            };
+    
+            // Voeg de WebView toe aan de Grid over de kaart
+            Grid.SetRow(_cameraViewer, 0);
+            Grid.SetColumn(_cameraViewer, 0);
+            Grid.SetColumnSpan(_cameraViewer, 2);
+            ((Grid)Content).Children.Add(_cameraViewer);
+
 
             // Initialiseer DatabaseHelper met pad op de desktop
             string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
@@ -346,6 +364,23 @@ namespace dashboard
             double x = Math.Cos(lat1Rad) * Math.Sin(lat2Rad) - Math.Sin(lat1Rad) * Math.Cos(lat2Rad) * Math.Cos(dLon);
             double bearingRad = Math.Atan2(y, x);
             return (bearingRad * 180 / Math.PI + 360) % 360;
+        }
+        
+        private void OnCameraButtonClicked(object sender, EventArgs e)
+        {
+            _isCameraActief = !_isCameraActief;
+            CameraButton.Text = _isCameraActief ? "Stop Camera" : "Camera Meekijken";
+    
+            if (_isCameraActief)
+            {
+                _cameraViewer.IsVisible = true;
+                _cameraViewer.Source = "http://Code:commando@145.93.236.86/api/holographic/stream/live_high.mp4?holo=true&pv=true&mic=true&loopback=true&RenderFromCamera=true";
+            }
+            else
+            {
+                _cameraViewer.IsVisible = false;
+                _cameraViewer.Source = new HtmlWebViewSource { Html = "<html><body style='background-color: black;'></body></html>" };
+            }
         }
     }
 }

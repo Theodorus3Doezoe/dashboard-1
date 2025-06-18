@@ -51,9 +51,11 @@
                 <Label Text="GPS Simulatie" TextColor="White" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center"/>
                 <Button x:Name="StartButton" Text="Start Simulatie" Clicked="StartSimulation_Clicked" />
                 <Button x:Name="StopButton" Text="Stop Simulatie" Clicked="StopSimulation_Clicked" IsEnabled="False" />
-                
+                <Button x:Name="CameraButton" Text="Camera Meekijken" Clicked="OnCameraButtonClicked" />
             </VerticalStackLayout>
         </Border>
+        
+
 
         <Border BackgroundColor="#2D3250" Grid.Row="1" Grid.Column="1">
             <ScrollView>
